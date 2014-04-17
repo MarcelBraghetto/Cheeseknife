@@ -5,11 +5,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleApp", "SampleApp\Samp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cheeseknife", "Cheeseknife\Cheeseknife.csproj", "{19D03BDF-6727-49F0-B105-F8DB07EF078D}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1256AE5D-6AAC-4FD1-8F32-9D1538D5242F}"
-	ProjectSection(SolutionItems) = preProject
-		LICENCE.txt = LICENCE.txt
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,8 +19,6 @@ Global
 		{91EBF146-D52D-46F1-9408-FB4308F05072}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{91EBF146-D52D-46F1-9408-FB4308F05072}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{91EBF146-D52D-46F1-9408-FB4308F05072}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = SampleApp\SampleApp.csproj
