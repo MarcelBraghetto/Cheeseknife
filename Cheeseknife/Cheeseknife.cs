@@ -149,6 +149,17 @@ namespace Com.Lilarcor.Cheeseknife {
 	}
 
 	/// <summary>
+	/// Inject after text changed event handler onto an Android View.
+	/// Your method must have the following signature:
+	/// <para></para><para></para>
+	/// void SomeMethodName(object sender, Android.Text.AfterTextChangedEventArgs e) { ... }
+	/// </summary>
+	[AttributeUsage(AttributeTargets.Method)]
+	public class InjectOnAfterTextChanged : BaseInjectionAttribute {
+		public InjectOnAfterTextChanged(int resourceId) : base(resourceId) { }
+	}
+
+	/// <summary>
 	/// Cheeseknife exception which gets thrown when injection mappings
 	/// are wrong or fail ...
 	/// </summary>
@@ -328,6 +339,7 @@ namespace Com.Lilarcor.Cheeseknife {
 			new ListView(null).ItemClick += (s, e) => {};
 			new ListView(null).ItemLongClick += (s, e) => {};
 			new CheckBox(null).CheckedChange += (s, e) => {};
+			new EditText(null).AfterTextChanged += (s, e) => {};
 		}
 
 		/// <summary>
@@ -354,6 +366,7 @@ namespace Com.Lilarcor.Cheeseknife {
 			types.Add(typeof(InjectOnEditorAction), "EditorAction");
 			types.Add(typeof(InjectOnTouch), "Touch");
 			types.Add(typeof(InjectOnTextChanged), "TextChanged");
+			types.Add(typeof(InjectOnAfterTextChanged), "AfterTextChanged");
 
 			return types;
 		}
