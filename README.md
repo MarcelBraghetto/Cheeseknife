@@ -17,6 +17,17 @@ Key coolness features of this library include:
 
 If you like this library or find it useful, feel free to send good thoughts in my general direction!
 
+Android Library Project Compatibility
+------------------------------------------------
+
+Cheeseknife is not compatible with code that is inside an Android Library project. This is due to how Android Library resource identifiers __are not final__ (whereas resource identifiers in non-library projects __are__ final), which is a requirement of using Cheeseknife annotations.
+
+The same problem happens in Java Android dev with Android Library projects as well, for example [Butterknife][1] (which Cheeseknife is inspired from) cannot auto inject UI fields in a library project either. Visit this link for more information about non-final resource identifiers in Android Library projects:
+
+[http://tools.android.com/tips/non-constant-fields][3]
+
+Butterknife should work just fine for any regular Android projects though.
+
 Including Cheeseknife in your project
 --------------------------------------------------
 There are a few ways to include Cheeseknife in your own Xamarin.Android project:
@@ -239,3 +250,4 @@ Licence
 
 [1]: http://jakewharton.github.io/butterknife/
 [2]: https://github.com/marcelbraghetto/cheeseknife
+[3]: http://tools.android.com/tips/non-constant-fields
