@@ -160,6 +160,17 @@ namespace Com.Lilarcor.Cheeseknife {
 	}
 
 	/// <summary>
+	/// Inject item selected event handler onto an Android Spinner View.
+	/// Your method must have the following signature:
+	/// <para></para><para></para>
+	/// void SomeMethodName(object sender, Spinner.ItemSelectedEventArgs e) { ... }
+	/// </summary>
+	[AttributeUsage(AttributeTargets.Method)]
+	public class InjectOnItemSelected : BaseInjectionAttribute {
+		public InjectOnItemSelected(int resourceId) : base(resourceId) { }
+	}
+
+	/// <summary>
 	/// Cheeseknife exception which gets thrown when injection mappings
 	/// are wrong or fail ...
 	/// </summary>
@@ -340,6 +351,7 @@ namespace Com.Lilarcor.Cheeseknife {
 			new ListView(null).ItemLongClick += (s, e) => {};
 			new CheckBox(null).CheckedChange += (s, e) => {};
 			new EditText(null).AfterTextChanged += (s, e) => {};
+			new Spinner(null).ItemSelected += (s, e) => {};
 		}
 
 		/// <summary>
@@ -367,6 +379,7 @@ namespace Com.Lilarcor.Cheeseknife {
 			types.Add(typeof(InjectOnTouch), "Touch");
 			types.Add(typeof(InjectOnTextChanged), "TextChanged");
 			types.Add(typeof(InjectOnAfterTextChanged), "AfterTextChanged");
+			types.Add(typeof(InjectOnItemSelected), "ItemSelected");
 
 			return types;
 		}
