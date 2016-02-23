@@ -4,21 +4,26 @@ using Android.OS;
 using System;
 using Com.Lilarcor.Cheeseknife;
 using Android.Support.V7.App;
+using Android.Views;
 
 namespace SampleApp {
 	[Activity(Label = "SampleApp", MainLauncher = true)]
-	public class MainActivity : ActionBarActivity {
+	public class MainActivity : AppCompatActivity {
 		// Include the 'InjectView' attribute for any Android
 		// view fields you would like to resolve with Cheeseknife.
 		[InjectView(Resource.Id.myTextView)] TextView textView;
 
-		// Include the 'InjectOnXXXXX' attributes for any Android
-		// view fields you would like to attach common events to.
-		// For example, the following attribute attaches the
-		// 'Click' event to a resource with the 'myButton' ID.
-		// Check the Cheeseknife documentation or source code
-		// to see event types that Cheeseknife currently supports.
-		[InjectOnClick(Resource.Id.myButton)]
+        // Include the 'InjectOptionalView' attribute for any Android
+        // view fields that may not always exist at runtime
+        [InjectOptionalView(Resource.Id.none)] View optionalView;
+
+        // Include the 'InjectOnXXXXX' attributes for any Android
+        // view fields you would like to attach common events to.
+        // For example, the following attribute attaches the
+        // 'Click' event to a resource with the 'myButton' ID.
+        // Check the Cheeseknife documentation or source code
+        // to see event types that Cheeseknife currently supports.
+        [InjectOnClick(Resource.Id.myButton)]
 		void OnClickMyButton(object sender, EventArgs e) {
 			// This code will run when the button is clicked ...
 			StartActivity(typeof(ListSampleActivity));
