@@ -18,6 +18,14 @@
             permitted on instance fields.
             </summary>
         </member>
+        <member name="T:Com.Lilarcor.Cheeseknife.InjectOptionalView">
+            <summary>
+            Inject optional view attribute. Android widgets based on the
+            View super class can be resolved at runtime when
+            annotated with this attribute. This attribute is only
+            permitted on instance fields.
+            </summary>
+        </member>
         <member name="T:Com.Lilarcor.Cheeseknife.InjectOnClick">
             <summary>
             Inject click event handler onto an Android View.
@@ -90,6 +98,22 @@
             void SomeMethodName(object sender, Android.Text.TextChangedEventArgs e) { ... }
             </summary>
         </member>
+        <member name="T:Com.Lilarcor.Cheeseknife.InjectOnAfterTextChanged">
+            <summary>
+            Inject after text changed event handler onto an Android View.
+            Your method must have the following signature:
+            <para></para><para></para>
+            void SomeMethodName(object sender, Android.Text.AfterTextChangedEventArgs e) { ... }
+            </summary>
+        </member>
+        <member name="T:Com.Lilarcor.Cheeseknife.InjectOnItemSelected">
+            <summary>
+            Inject item selected event handler onto an Android Spinner View.
+            Your method must have the following signature:
+            <para></para><para></para>
+            void SomeMethodName(object sender, Spinner.ItemSelectedEventArgs e) { ... }
+            </summary>
+        </member>
         <member name="T:Com.Lilarcor.Cheeseknife.CheeseknifeException">
             <summary>
             Cheeseknife exception which gets thrown when injection mappings
@@ -107,7 +131,7 @@
         </member>
         <member name="M:Com.Lilarcor.Cheeseknife.CheeseknifeException.#ctor(System.Type[])">
             <summary>
-            Call this constructor with a list of required event type
+            Call this constructor with a list of required event type 
             parameters to indicate that the parameters couldn't be found
             or matched to the signature of the user attributed method.
             </summary>
@@ -143,40 +167,51 @@
             </summary>
         </member>
         <member name="M:Com.Lilarcor.Cheeseknife.Cheeseknife.Inject(Android.App.Activity)">
-            <summary>
-            Inject the specified parent activity, scanning all class
-            member fields and methods for injection attributions. The
-            assumption is that the activitie's 'Window.DecorView.RootView'
-            represents the root view in the layout hierarchy for the
-            given activity.<para></para><para></para>
-            Sample activity usage:<para></para><para></para>
-            [InjectView(Resource.Id.my_text_view)]<para></para>
-            TextView myTextView;<para></para><para></para>
-            [InjectOnClick(Resource.Id.my_button)]<para></para>
-            void OnMyButtonClick(object sender, EventArgs e) {<para></para>
-            . . . myTextView.Text = "I clicked my button!";<para></para>
-            }<para></para><para></para>
-            protected override void OnCreate(Bundle bundle) {<para></para>
-            . . . base.OnCreate(bundle);<para></para><para></para>
-            . . . SetContentView(Resource.Layout.Main);<para></para>
-            . . . Cheeseknife.Inject(this);<para></para><para></para>
-            . . . myTextView.Text = "I was injected!";<para></para>
-            }<para></para></summary>
-            <param name="parent">Parent.</param>
+             <summary>
+             Inject the specified parent activity, scanning all class
+             member fields and methods for injection attributions. The
+             assumption is that the activitie's 'Window.DecorView.RootView'
+             represents the root view in the layout hierarchy for the
+             given activity.<para></para>
+             <para></para>
+             Sample activity usage:<para></para>
+             <para></para>
+             [InjectView(Resource.Id.my_text_view)]<para></para>
+             TextView myTextView;<para></para>
+             <para></para>
+             [InjectOnClick(Resource.Id.my_button)]<para></para>
+             void OnMyButtonClick(object sender, EventArgs e) {<para></para>
+             . . . myTextView.Text = "I clicked my button!";<para></para>
+             }<para></para>
+             <para></para>
+             protected override void OnCreate(Bundle bundle) {<para></para>
+             . . . base.OnCreate(bundle);<para></para>
+            <para></para>
+             . . . SetContentView(Resource.Layout.Main);<para></para>
+             . . . Cheeseknife.Inject(this);<para></para>
+             <para></para>
+             . . . myTextView.Text = "I was injected!";<para></para>
+             }<para></para>
+             </summary>
+             <param name="parent">Parent.</param>
         </member>
         <member name="M:Com.Lilarcor.Cheeseknife.Cheeseknife.Inject(System.Object,Android.Views.View)">
             <summary>
             Inject the specified parent and view, scanning all class
             member fields and methods for injection attributions.
             This method would normally be called to inject a fragment
-            or other arbitrary view container. eg:<para></para><para></para>
-            Fragment Example Usage:<para></para><para></para>
+            or other arbitrary view container. eg:<para></para>
+            <para></para>
+            Fragment Example Usage:<para></para>
+            <para></para>
             In your OnCreateView method ...<para></para>
             var view = inflater.Inflate(Resource.Layout.fragment, null);<para></para>
             Cheeseknife.Inject(this, view);<para></para>
-            return view;<para></para><para></para>
+            return view;<para></para>
+            <para></para>
             In your OnDestroyView method ...<para></para>
-            Cheeseknife.Reset(this);<para></para></summary>
+            Cheeseknife.Reset(this);<para></para>
+            </summary>
             <param name="parent">Parent.</param>
             <param name="view">View.</param>
         </member>
@@ -198,7 +233,7 @@
             to be preserved. If you want to add other events to
             Cheeseknife, be sure to register dummy events in this
             method to be sure it doesn't get stripped from your
-            release builds. Does this feel hacky? Sure does -
+            release builds. Does this feel hacky? Sure does - 
             thankyou Linker!
             </summary>
         </member>
@@ -259,11 +294,13 @@
             Injects the parent class by iterating over all of its
             fields, properties and methods, checking if they have
             injection attributes. For any fields/props/methods that
-            have injection attributes do the following:<para></para><para></para>
-            1. If it is a field/prop -&gt; attempt to resolve the actual
+            have injection attributes do the following:<para></para>
+            <para></para>
+            1. If it is a field/prop -> attempt to resolve the actual
             Android widget in the given view and assign it as the
-            field value, effectively 'injecting' it.<para></para><para></para>
-            2. If it is a method -&gt; attempt to apply an event
+            field value, effectively 'injecting' it.<para></para>
+            <para></para>
+            2. If it is a method -> attempt to apply an event
             handler of the related type to the widget identified
             by the resource id specified in the attribute. Some
             widget types are verified before applying the events.
