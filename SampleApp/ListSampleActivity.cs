@@ -4,7 +4,7 @@ using Android.Support.V7.App;
 
 namespace SampleApp {
 	[Activity(Label = "ListSampleActivity")]			
-	public class ListSampleActivity : ActionBarActivity {
+	public class ListSampleActivity : AppCompatActivity {
 		protected override void OnCreate(Bundle savedInstanceState) {
 			base.OnCreate(savedInstanceState);
 
