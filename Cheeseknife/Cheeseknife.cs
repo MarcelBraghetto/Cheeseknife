@@ -32,9 +32,16 @@ namespace Com.Lilarcor.Cheeseknife {
 	/// </summary>
 	public class BaseInjectionAttribute : Attribute {
 		public int ResourceId { get; private set; }
+        public bool IsOptional { get; private set; }
 
-		public BaseInjectionAttribute(int resourceId) {
+        public BaseInjectionAttribute(int resourceId) {
+            ResourceId = resourceId;
+            IsOptional = false;
+        }
+
+        public BaseInjectionAttribute(int resourceId, bool isOptional) {
 			ResourceId = resourceId;
+            IsOptional = isOptional;
 		}
 	}
 
@@ -47,15 +54,27 @@ namespace Com.Lilarcor.Cheeseknife {
 	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
 	public class InjectView : BaseInjectionAttribute {	
 		public InjectView(int resourceId) : base(resourceId) { }
-	}
+        public InjectView(int resourceId, bool isOptional) : base(resourceId, isOptional) { }
+    }
 
-	/// <summary>
-	/// Inject click event handler onto an Android View.
-	/// Your method must have the following signature:
-	/// <para></para><para></para>
-	/// void SomeMethodName(object sender, EventArgs e) { ... }
+    /// <summary>
+	/// Inject optional view attribute. Android widgets based on the
+	/// View super class can be resolved at runtime when
+	/// annotated with this attribute. This attribute is only
+	/// permitted on instance fields.
 	/// </summary>
-	[AttributeUsage(AttributeTargets.Method)]
+	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+    public class InjectOptionalView : InjectView {
+        public InjectOptionalView(int resourceId) : base(resourceId, true) { }
+    }
+
+    /// <summary>
+    /// Inject click event handler onto an Android View.
+    /// Your method must have the following signature:
+    /// <para></para><para></para>
+    /// void SomeMethodName(object sender, EventArgs e) { ... }
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method)]
 	public class InjectOnClick : BaseInjectionAttribute {
 		public InjectOnClick(int resourceId) : base(resourceId) { }
 	}
@@ -456,7 +475,11 @@ namespace Com.Lilarcor.Cheeseknife {
 				var attribute = field.GetCustomAttribute<InjectView>();
 				var genericMethod = resolveMethod.MakeGenericMethod(field.FieldType);
 				var widget = genericMethod.Invoke(parent, new object[] { view, attribute.ResourceId });
-				field.SetValue(parent, widget);
+
+                if (widget == null && !attribute.IsOptional)
+                    throw new ArgumentException(field.Name, "View was not found. Use InjectOptionalView if this field can be null.");
+                else
+				    field.SetValue(parent, widget);
 			}
 
 			// Grab all the properties in the parent class that have custom attributes
@@ -465,8 +488,12 @@ namespace Com.Lilarcor.Cheeseknife {
 				var attribute = property.GetCustomAttribute<InjectView>();
 				var genericMethod = resolveMethod.MakeGenericMethod(property.PropertyType);
 				var widget = genericMethod.Invoke(parent, new object[] { view, attribute.ResourceId });
-				property.SetValue(parent, widget);
-			}
+
+                if (widget == null && !attribute.IsOptional)
+                    throw new ArgumentException(property.Name, "View was not found. Use InjectOptionalView if this property can be null.");
+                else
+                    property.SetValue(parent, widget);
+            }
 
 			// Retrieve all our registered Attribute/Event types to scan
 			foreach(var injectableEvent in GetInjectableEvents()) {
