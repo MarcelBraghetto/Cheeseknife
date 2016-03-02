@@ -30,11 +30,10 @@ Butterknife should work just fine for any regular Android projects though.
 
 Including Cheeseknife in your project
 --------------------------------------------------
-There are a few ways to include Cheeseknife in your own Xamarin.Android project:
+There are a couple of ways to include Cheeseknife in your own Xamarin.Android project:
 
 * Option 1: Copy the `Cheeseknife` library project from the demo solution and add it as a reference to your Android project.
-* Option 2: Copy the `Cheeseknife.dll` and `Cheeseknife.xml` files from the `Binaries` folder in the demo solution to your own GAC folder and include the DLL in your assembly references.
-* Option 3: Copy the `Cheeseknife.cs` source file into your own project and add it into your solution.
+* Option 2: Copy the `Cheeseknife.cs` source file into your own project and add it into your solution.
 
 Usage - Activity
 ---------------------
