@@ -17,6 +17,8 @@ Key coolness features of this library include:
 
 If you like this library or find it useful, feel free to send good thoughts in my general direction!
 
+Note: I no longer use the Xamarin tools for mobile development. This library will continue to be available however I no longer actively develop it.
+
 Android Library Project Compatibility
 ------------------------------------------------
 
