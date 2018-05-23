@@ -171,6 +171,18 @@ namespace Com.Lilarcor.Cheeseknife {
 	}
 
 	/// <summary>
+	/// Inject progress changed event handler onto an Android SeekBar.
+	/// Your method must have the following signature:
+	/// <para></para><para></para>
+	/// void SomeMethodName(object sender, SeekBar.ProgressChangedEventArgs e) { ... }
+	/// </summary>
+	[AttributeUsage(AttributeTargets.Method)]
+    public class InjectOnProgressChanged: BaseInjectionAttribute
+    {
+        public InjectOnProgressChanged(int resourceId) : base(resourceId) { }
+    }
+
+	/// <summary>
 	/// Cheeseknife exception which gets thrown when injection mappings
 	/// are wrong or fail ...
 	/// </summary>
@@ -352,6 +364,7 @@ namespace Com.Lilarcor.Cheeseknife {
 			new CheckBox(null).CheckedChange += (s, e) => {};
 			new EditText(null).AfterTextChanged += (s, e) => {};
 			new Spinner(null).ItemSelected += (s, e) => {};
+			new SeekBar(null).ProgressChanged += (s, e) => {};
 		}
 
 		/// <summary>
@@ -380,6 +393,7 @@ namespace Com.Lilarcor.Cheeseknife {
 			types.Add(typeof(InjectOnTextChanged), "TextChanged");
 			types.Add(typeof(InjectOnAfterTextChanged), "AfterTextChanged");
 			types.Add(typeof(InjectOnItemSelected), "ItemSelected");
+			types.Add(typeof(InjectOnProgressChanged), "ProgressChanged");
 
 			return types;
 		}
