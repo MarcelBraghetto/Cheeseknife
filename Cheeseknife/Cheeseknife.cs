@@ -177,10 +177,9 @@ namespace Com.Lilarcor.Cheeseknife {
 	/// void SomeMethodName(object sender, SeekBar.ProgressChangedEventArgs e) { ... }
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Method)]
-    public class InjectOnProgressChanged: BaseInjectionAttribute
-    {
-        public InjectOnProgressChanged(int resourceId) : base(resourceId) { }
-    }
+        public class InjectOnProgressChanged: BaseInjectionAttribute {
+	    	public InjectOnProgressChanged(int resourceId) : base(resourceId) { }
+	}
 
 	/// <summary>
 	/// Cheeseknife exception which gets thrown when injection mappings
