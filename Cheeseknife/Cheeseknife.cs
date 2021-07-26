@@ -203,7 +203,7 @@ namespace Com.Lilarcor.Cheeseknife {
 		/// or matched to the signature of the user attributed method.
 		/// </summary>
 		/// <param name="requiredEventParameters">Required event types.</param>
-		public CheeseknifeException(Type[] requiredEventParameters) : base(GetArgumentTypeExceptionMessage(requiredEventParameters)) { }
+		public CheeseknifeException(string methodName, Type[] requiredEventParameters) : base(GetArgumentTypeExceptionMessage(methodName,requiredEventParameters)) { }
 
 		/// <summary>
 		/// Gets the view type exception message for an Android view class
@@ -231,10 +231,12 @@ namespace Com.Lilarcor.Cheeseknife {
 		/// </summary>
 		/// <returns>The argument type exception message.</returns>
 		/// <param name="requiredEventParameters">Required event parameters.</param>
-		static string GetArgumentTypeExceptionMessage(Type[] requiredEventParameters) {
+		static string GetArgumentTypeExceptionMessage(string methodName, Type[] requiredEventParameters) {
 			var sb = new StringBuilder();
 			sb.Append(PREFIX);
-			sb.Append(" Incorrect arguments in receiving method, should be => (");
+			sb.Append(" Incorrect arguments in receiving method ");
+			sb.Append(methodName);
+			sb.Append(", should be => (");
 			for(var i = 0; i < requiredEventParameters.Length; i++) {
 				sb.Append(requiredEventParameters[i].ToString());
 				if(i < requiredEventParameters.Length - 1) {
@@ -532,13 +534,13 @@ namespace Com.Lilarcor.Cheeseknife {
 
 			// If the user method doesn't define the same number of parameters as the event type, bail ...
 			if(methodParameterTypes.Length != eventParameterTypes.Length) {
-				throw new CheeseknifeException(eventParameterTypes);
+				throw new CheeseknifeException(method.Name, eventParameterTypes);
 			}
 
 			// Step through the method parameters and event type parameters and make sure the Type of each param matches.
 			for(var i = 0; i < methodParameterTypes.Length; i++) {
 				if(methodParameterTypes[i] != eventParameterTypes[i]) {
-					throw new CheeseknifeException(eventParameterTypes);
+					throw new CheeseknifeException(method.Name, eventParameterTypes);
 				}
 			}
 
