@@ -198,6 +198,15 @@ namespace Com.Lilarcor.Cheeseknife {
 		public CheeseknifeException(Type viewType, string eventName) : base(GetViewTypeExceptionMessage(viewType, eventName)) { }
 
 		/// <summary>
+		/// Call this constructor with an Android resource id and a method name
+		/// event name to indicate there is no view having the specified resource id
+		/// to which inject the annotated event handler 
+		/// </summary>
+		/// <param name="resourceId">Resource.Id of the missing View</param>
+		/// <param name="methodName">name of method that was requested to inject as a event handler</param>
+		public CheeseknifeException(int resourceId, string methodName): base(GetViewTypeExceptionMessage(resourceId, methodName)) { }
+
+		/// <summary>
 		/// Call this constructor with a list of required event type 
 		/// parameters to indicate that the parameters couldn't be found
 		/// or matched to the signature of the user attributed method.
@@ -220,6 +229,24 @@ namespace Com.Lilarcor.Cheeseknife {
 			sb.Append("', the Android view type '");
 			sb.Append(viewType.ToString());
 			sb.Append("' doesn't appear to support this event.");
+			return sb.ToString();
+		}
+
+		/// <summary>
+		/// Gets the exception message for a event handler that could not be
+		/// injected because the corresponding view was not found
+		/// </summary>
+		/// <returns>The exception message.</returns>
+		/// <param name="resourceId">the Resource.Id for which we didn't find a corresponding view.</param>
+		/// <param name="methodName">the name of the method that should have been used as a event handler for the missing view.</param>
+		static string GetViewTypeExceptionMessage(int resourceId, string methodName) {
+			var sb = new StringBuilder();
+			sb.Append(PREFIX);
+			sb.Append(" Could not find the view having resource id=");
+			sb.Append(resourceId);
+			sb.Append(" for event handler '");
+			sb.Append(methodName);
+			sb.Append("'");
 			return sb.ToString();
 		}
 
@@ -519,6 +546,11 @@ namespace Com.Lilarcor.Cheeseknife {
 
 			// Get a reference to the Android UI object with the attributed resource id
 			var widget = view.FindViewById<View>(attribute.ResourceId);
+
+			if (widget == null) {
+				throw new CheeseknifeException(attribute.ResourceId, method.Name);
+			}
+
 
 			// Attempt to find the given event name on the widget.
 			// If the event cannot be found, then we can't do anything
