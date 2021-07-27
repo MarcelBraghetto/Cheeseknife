@@ -24,563 +24,684 @@ using Android.Widget;
 using System.Text;
 using Android.Runtime;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Com.Lilarcor.Cheeseknife {
-	/// <summary>
-	/// Base injection attribute, to include a ResourceId
-	/// which should refer to an Android view resource id.
-	/// </summary>
-	public class BaseInjectionAttribute : Attribute {
-		public int ResourceId { get; private set; }
+    /// <summary>
+    /// Base injection attribute, to include a ResourceId
+    /// which should refer to an Android view resource id.
+    /// </summary>
+    public class BaseInjectionAttribute : Attribute {
+        public int ResourceId { get; private set; }
 
-		public BaseInjectionAttribute(int resourceId) {
-			ResourceId = resourceId;
-		}
-	}
+        public BaseInjectionAttribute(int resourceId) {
+            ResourceId = resourceId;
+        }
+    }
 
-	/// <summary>
-	/// Inject view attribute. Android widgets based on the
-	/// View super class can be resolved at runtime when
-	/// annotated with this attribute. This attribute is only
-	/// permitted on instance fields.
-	/// </summary>
-	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-	public class InjectView : BaseInjectionAttribute {	
-		public InjectView(int resourceId) : base(resourceId) { }
-	}
+    /// <summary>
+    /// Inject view attribute. Android widgets based on the
+    /// View super class can be resolved at runtime when
+    /// annotated with this attribute. This attribute is only
+    /// permitted on instance fields.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+    public class InjectView : BaseInjectionAttribute {
+        public InjectView(int resourceId) : base(resourceId) { }
+    }
 
-	/// <summary>
-	/// Inject click event handler onto an Android View.
-	/// Your method must have the following signature:
-	/// <para></para><para></para>
-	/// void SomeMethodName(object sender, EventArgs e) { ... }
-	/// </summary>
-	[AttributeUsage(AttributeTargets.Method)]
-	public class InjectOnClick : BaseInjectionAttribute {
-		public InjectOnClick(int resourceId) : base(resourceId) { }
-	}
+    /// <summary>
+    /// Inject click event handler onto an Android View.
+    /// Your method must have the following signature:
+    /// <para></para><para></para>
+    /// void SomeMethodName(object sender, EventArgs e) { ... }
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method)]
+    public class InjectOnClick : BaseInjectionAttribute {
+        public InjectOnClick(int resourceId) : base(resourceId) { }
+    }
 
-	/// <summary>
-	/// Inject checked change event handler onto an Android CompoundButton View.
-	/// Your method must have the following signature:
-	/// <para></para><para></para>
-	/// void SomeMethodName(object sender, CompoundButton.CheckedChangeEventArgs e) { ... }
-	/// </summary>
-	[AttributeUsage(AttributeTargets.Method)]
-	public class InjectOnCheckedChange : BaseInjectionAttribute {
-		public InjectOnCheckedChange(int resourceId) : base(resourceId) { }
-	}
+    /// <summary>
+    /// Inject checked change event handler onto an Android CompoundButton View.
+    /// Your method must have the following signature:
+    /// <para></para><para></para>
+    /// void SomeMethodName(object sender, CompoundButton.CheckedChangeEventArgs e) { ... }
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method)]
+    public class InjectOnCheckedChange : BaseInjectionAttribute {
+        public InjectOnCheckedChange(int resourceId) : base(resourceId) { }
+    }
 
-	/// <summary>
-	/// Inject editor action event handler onto an Android TextView.
-	/// Your method must have the following signature:
-	/// <para></para><para></para>
-	/// void SomeMethodName(object sender, TextView.EditorActionEventArgs e) { ... }
-	/// </summary>
-	[AttributeUsage(AttributeTargets.Method)]
-	public class InjectOnEditorAction : BaseInjectionAttribute {
-		public InjectOnEditorAction(int resourceId) : base(resourceId) { }
-	}
+    /// <summary>
+    /// Inject editor action event handler onto an Android TextView.
+    /// Your method must have the following signature:
+    /// <para></para><para></para>
+    /// void SomeMethodName(object sender, TextView.EditorActionEventArgs e) { ... }
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method)]
+    public class InjectOnEditorAction : BaseInjectionAttribute {
+        public InjectOnEditorAction(int resourceId) : base(resourceId) { }
+    }
 
-	/// <summary>
-	/// Inject focus changed event handler onto an Android View.
-	/// Your method must have the following signature:
-	/// <para></para><para></para>
-	/// void SomeMethodName(object sender, View.FocusChangeEventArgs e) { ... }
-	/// </summary>
-	[AttributeUsage(AttributeTargets.Method)]
-	public class InjectOnFocusChange : BaseInjectionAttribute {
-		public InjectOnFocusChange(int resourceId) : base(resourceId) { }
-	}
+    /// <summary>
+    /// Inject focus changed event handler onto an Android View.
+    /// Your method must have the following signature:
+    /// <para></para><para></para>
+    /// void SomeMethodName(object sender, View.FocusChangeEventArgs e) { ... }
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method)]
+    public class InjectOnFocusChange : BaseInjectionAttribute {
+        public InjectOnFocusChange(int resourceId) : base(resourceId) { }
+    }
 
-	/// <summary>
-	/// Inject item click event handler onto an Android AdapterView.
-	/// Your method must have the following signature:
-	/// <para></para><para></para>
-	/// void SomeMethodName(object sender, AdapterView.ItemClickEventArgs e) { ... }
-	/// </summary>
-	[AttributeUsage(AttributeTargets.Method)]
-	public class InjectOnItemClick : BaseInjectionAttribute {
-		public InjectOnItemClick(int resourceId) : base(resourceId) { }
-	}
+    /// <summary>
+    /// Inject item click event handler onto an Android AdapterView.
+    /// Your method must have the following signature:
+    /// <para></para><para></para>
+    /// void SomeMethodName(object sender, AdapterView.ItemClickEventArgs e) { ... }
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method)]
+    public class InjectOnItemClick : BaseInjectionAttribute {
+        public InjectOnItemClick(int resourceId) : base(resourceId) { }
+    }
 
-	/// <summary>
-	/// Inject item long click event handler onto an Android AdapterView.
-	/// Your method must have the following signature:
-	/// <para></para><para></para>
-	/// void SomeMethodName(object sender, AdapterView.ItemLongClickEventArgs e) { ... }
-	/// </summary>
-	[AttributeUsage(AttributeTargets.Method)]
-	public class InjectOnItemLongClick : BaseInjectionAttribute {
-		public InjectOnItemLongClick(int resourceId) : base(resourceId) { }
-	}
+    /// <summary>
+    /// Inject item long click event handler onto an Android AdapterView.
+    /// Your method must have the following signature:
+    /// <para></para><para></para>
+    /// void SomeMethodName(object sender, AdapterView.ItemLongClickEventArgs e) { ... }
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method)]
+    public class InjectOnItemLongClick : BaseInjectionAttribute {
+        public InjectOnItemLongClick(int resourceId) : base(resourceId) { }
+    }
 
-	/// <summary>
-	/// Inject long click event handler onto an Android View.
-	/// Your method must have the following signature:
-	/// <para></para><para></para>
-	/// void SomeMethodName(object sender, View.LongClickEventArgs e) { ... }
-	/// </summary>
-	[AttributeUsage(AttributeTargets.Method)]
-	public class InjectOnLongClick : BaseInjectionAttribute {
-		public InjectOnLongClick(int resourceId) : base(resourceId) { }
-	}
+    /// <summary>
+    /// Inject long click event handler onto an Android View.
+    /// Your method must have the following signature:
+    /// <para></para><para></para>
+    /// void SomeMethodName(object sender, View.LongClickEventArgs e) { ... }
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method)]
+    public class InjectOnLongClick : BaseInjectionAttribute {
+        public InjectOnLongClick(int resourceId) : base(resourceId) { }
+    }
 
-	/// <summary>
-	/// Inject touch event handler onto an Android View.
-	/// Your method must have the following signature:
-	/// <para></para><para></para>
-	/// void SomeMethodName(object sender, View.TouchEventArgs e) { ... }
-	/// </summary>
-	[AttributeUsage(AttributeTargets.Method)]
-	public class InjectOnTouch : BaseInjectionAttribute {
-		public InjectOnTouch(int resourceId) : base(resourceId) { }
-	}
+    /// <summary>
+    /// Inject touch event handler onto an Android View.
+    /// Your method must have the following signature:
+    /// <para></para><para></para>
+    /// void SomeMethodName(object sender, View.TouchEventArgs e) { ... }
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method)]
+    public class InjectOnTouch : BaseInjectionAttribute {
+        public InjectOnTouch(int resourceId) : base(resourceId) { }
+    }
 
-	/// <summary>
-	/// Inject text changed event handler onto an Android View.
-	/// Your method must have the following signature:
-	/// <para></para><para></para>
-	/// void SomeMethodName(object sender, Android.Text.TextChangedEventArgs e) { ... }
-	/// </summary>
-	[AttributeUsage(AttributeTargets.Method)]
-	public class InjectOnTextChanged : BaseInjectionAttribute {
-		public InjectOnTextChanged(int resourceId) : base(resourceId) { }
-	}
+    /// <summary>
+    /// Inject text changed event handler onto an Android View.
+    /// Your method must have the following signature:
+    /// <para></para><para></para>
+    /// void SomeMethodName(object sender, Android.Text.TextChangedEventArgs e) { ... }
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method)]
+    public class InjectOnTextChanged : BaseInjectionAttribute {
+        public InjectOnTextChanged(int resourceId) : base(resourceId) { }
+    }
 
-	/// <summary>
-	/// Inject after text changed event handler onto an Android View.
-	/// Your method must have the following signature:
-	/// <para></para><para></para>
-	/// void SomeMethodName(object sender, Android.Text.AfterTextChangedEventArgs e) { ... }
-	/// </summary>
-	[AttributeUsage(AttributeTargets.Method)]
-	public class InjectOnAfterTextChanged : BaseInjectionAttribute {
-		public InjectOnAfterTextChanged(int resourceId) : base(resourceId) { }
-	}
+    /// <summary>
+    /// Inject after text changed event handler onto an Android View.
+    /// Your method must have the following signature:
+    /// <para></para><para></para>
+    /// void SomeMethodName(object sender, Android.Text.AfterTextChangedEventArgs e) { ... }
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method)]
+    public class InjectOnAfterTextChanged : BaseInjectionAttribute {
+        public InjectOnAfterTextChanged(int resourceId) : base(resourceId) { }
+    }
 
-	/// <summary>
-	/// Inject item selected event handler onto an Android Spinner View.
-	/// Your method must have the following signature:
-	/// <para></para><para></para>
-	/// void SomeMethodName(object sender, Spinner.ItemSelectedEventArgs e) { ... }
-	/// </summary>
-	[AttributeUsage(AttributeTargets.Method)]
-	public class InjectOnItemSelected : BaseInjectionAttribute {
-		public InjectOnItemSelected(int resourceId) : base(resourceId) { }
-	}
+    /// <summary>
+    /// Inject item selected event handler onto an Android Spinner View.
+    /// Your method must have the following signature:
+    /// <para></para><para></para>
+    /// void SomeMethodName(object sender, Spinner.ItemSelectedEventArgs e) { ... }
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method)]
+    public class InjectOnItemSelected : BaseInjectionAttribute {
+        public InjectOnItemSelected(int resourceId) : base(resourceId) { }
+    }
 
-	/// <summary>
-	/// Inject progress changed event handler onto an Android SeekBar.
-	/// Your method must have the following signature:
-	/// <para></para><para></para>
-	/// void SomeMethodName(object sender, SeekBar.ProgressChangedEventArgs e) { ... }
-	/// </summary>
-	[AttributeUsage(AttributeTargets.Method)]
-        public class InjectOnProgressChanged: BaseInjectionAttribute {
-	    	public InjectOnProgressChanged(int resourceId) : base(resourceId) { }
-	}
+    /// <summary>
+    /// Inject progress changed event handler onto an Android SeekBar.
+    /// Your method must have the following signature:
+    /// <para></para><para></para>
+    /// void SomeMethodName(object sender, SeekBar.ProgressChangedEventArgs e) { ... }
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method)]
+    public class InjectOnProgressChanged : BaseInjectionAttribute {
+        public InjectOnProgressChanged(int resourceId) : base(resourceId) { }
+    }
 
-	/// <summary>
-	/// Cheeseknife exception which gets thrown when injection mappings
-	/// are wrong or fail ...
-	/// </summary>
-	public class CheeseknifeException : Exception {
-		const string PREFIX = "Cheeseknife Exception: ";
+    /// <summary>
+    /// Cheeseknife exception which gets thrown when injection mappings
+    /// are wrong or fail ...
+    /// </summary>
+    public class CheeseknifeException : Exception {
+        const string PREFIX = "Cheeseknife Exception: ";
 
-		/// <summary>
-		/// Call this constructor with an Android view class type and a UI
-		/// event name to indicate that the view class is not compatible
-		/// with the particular event type specified.
-		/// </summary>
-		/// <param name="viewType">View type.</param>
-		/// <param name="eventName">Event name.</param>
-		public CheeseknifeException(Type viewType, string eventName) : base(GetViewTypeExceptionMessage(viewType, eventName)) { }
+        /// <summary>
+        /// Call this constructor with an Android view class type and a UI
+        /// event name to indicate that the view class is not compatible
+        /// with the particular event type specified.
+        /// </summary>
+        /// <param name="viewType">View type.</param>
+        /// <param name="eventName">Event name.</param>
+        public CheeseknifeException(Type viewType, string eventName) : base(GetViewTypeExceptionMessage(viewType, eventName)) { }
 
-		/// <summary>
-		/// Call this constructor with an Android resource id and a method name
-		/// event name to indicate there is no view having the specified resource id
-		/// to which inject the annotated event handler 
-		/// </summary>
-		/// <param name="resourceId">Resource.Id of the missing View</param>
-		/// <param name="methodName">name of method that was requested to inject as a event handler</param>
-		public CheeseknifeException(int resourceId, string methodName): base(GetViewTypeExceptionMessage(resourceId, methodName)) { }
+        /// <summary>
+        /// Call this constructor with an Android resource id and a method name
+        /// event name to indicate there is no view having the specified resource id
+        /// to which inject the annotated event handler 
+        /// </summary>
+        /// <param name="resourceId">Resource.Id of the missing View</param>
+        /// <param name="methodName">name of method that was requested to inject as a event handler</param>
+        public CheeseknifeException(int resourceId, string methodName) : base(GetViewTypeExceptionMessage(resourceId, methodName)) { }
 
-		/// <summary>
-		/// Call this constructor with a list of required event type 
-		/// parameters to indicate that the parameters couldn't be found
-		/// or matched to the signature of the user attributed method.
-		/// </summary>
-		/// <param name="requiredEventParameters">Required event types.</param>
-		public CheeseknifeException(string methodName, Type[] requiredEventParameters) : base(GetArgumentTypeExceptionMessage(methodName,requiredEventParameters)) { }
+        /// <summary>
+        /// Call this constructor with a list of required event type 
+        /// parameters to indicate that the parameters couldn't be found
+        /// or matched to the signature of the user attributed method.
+        /// </summary>
+        /// <param name="requiredEventParameters">Required event types.</param>
+        public CheeseknifeException(string methodName, Type[] requiredEventParameters) : base(GetArgumentTypeExceptionMessage(methodName, requiredEventParameters)) { }
 
-		/// <summary>
-		/// Gets the view type exception message for an Android view class
-		/// that can't receive the specified event type.
-		/// </summary>
-		/// <returns>The view type exception message.</returns>
-		/// <param name="viewType">View type.</param>
-		/// <param name="eventName">Event name.</param>
-		static string GetViewTypeExceptionMessage(Type viewType, string eventName) {
-			var sb = new StringBuilder();
-			sb.Append(PREFIX);
-			sb.Append(" Incompatible Android view type specified for event '");
-			sb.Append(eventName);
-			sb.Append("', the Android view type '");
-			sb.Append(viewType.ToString());
-			sb.Append("' doesn't appear to support this event.");
-			return sb.ToString();
-		}
+        /// <summary>
+        /// Gets the view type exception message for an Android view class
+        /// that can't receive the specified event type.
+        /// </summary>
+        /// <returns>The view type exception message.</returns>
+        /// <param name="viewType">View type.</param>
+        /// <param name="eventName">Event name.</param>
+        static string GetViewTypeExceptionMessage(Type viewType, string eventName) {
+            var sb = new StringBuilder();
+            sb.Append(PREFIX);
+            sb.Append(" Incompatible Android view type specified for event '");
+            sb.Append(eventName);
+            sb.Append("', the Android view type '");
+            sb.Append(viewType.ToString());
+            sb.Append("' doesn't appear to support this event.");
+            return sb.ToString();
+        }
 
-		/// <summary>
-		/// Gets the exception message for a event handler that could not be
-		/// injected because the corresponding view was not found
-		/// </summary>
-		/// <returns>The exception message.</returns>
-		/// <param name="resourceId">the Resource.Id for which we didn't find a corresponding view.</param>
-		/// <param name="methodName">the name of the method that should have been used as a event handler for the missing view.</param>
-		static string GetViewTypeExceptionMessage(int resourceId, string methodName) {
-			var sb = new StringBuilder();
-			sb.Append(PREFIX);
-			sb.Append(" Could not find the view having resource id=");
-			sb.Append(resourceId);
-			sb.Append(" for event handler '");
-			sb.Append(methodName);
-			sb.Append("'");
-			return sb.ToString();
-		}
+        /// <summary>
+        /// Gets the exception message for a event handler that could not be
+        /// injected because the corresponding view was not found
+        /// </summary>
+        /// <returns>The exception message.</returns>
+        /// <param name="resourceId">the Resource.Id for which we didn't find a corresponding view.</param>
+        /// <param name="methodName">the name of the method that should have been used as a event handler for the missing view.</param>
+        static string GetViewTypeExceptionMessage(int resourceId, string methodName) {
+            var sb = new StringBuilder();
+            sb.Append(PREFIX);
+            sb.Append(" Could not find the view having resource id=");
+            sb.Append(resourceId);
+            sb.Append(" for event handler '");
+            sb.Append(methodName);
+            sb.Append("'");
+            return sb.ToString();
+        }
 
-		/// <summary>
-		/// Gets the argument type exception message when the user attributed
-		/// method doesn't have the same number of parameters as the specified
-		/// event signature, or the parameter types don't match between the
-		/// event and user method.
-		/// </summary>
-		/// <returns>The argument type exception message.</returns>
-		/// <param name="requiredEventParameters">Required event parameters.</param>
-		static string GetArgumentTypeExceptionMessage(string methodName, Type[] requiredEventParameters) {
-			var sb = new StringBuilder();
-			sb.Append(PREFIX);
-			sb.Append(" Incorrect arguments in receiving method ");
-			sb.Append(methodName);
-			sb.Append(", should be => (");
-			for(var i = 0; i < requiredEventParameters.Length; i++) {
-				sb.Append(requiredEventParameters[i].ToString());
-				if(i < requiredEventParameters.Length - 1) {
-					sb.Append(", ");
-				}
-			}
-			sb.Append(")");
-			return sb.ToString();
-		}
-	}
+        /// <summary>
+        /// Gets the argument type exception message when the user attributed
+        /// method doesn't have the same number of parameters as the specified
+        /// event signature, or the parameter types don't match between the
+        /// event and user method.
+        /// </summary>
+        /// <returns>The argument type exception message.</returns>
+        /// <param name="requiredEventParameters">Required event parameters.</param>
+        static string GetArgumentTypeExceptionMessage(string methodName, Type[] requiredEventParameters) {
+            var sb = new StringBuilder();
+            sb.Append(PREFIX);
+            sb.Append(" Incorrect arguments in receiving method ");
+            sb.Append(methodName);
+            sb.Append(", should be => (");
+            for (var i = 0; i < requiredEventParameters.Length; i++) {
+                sb.Append(requiredEventParameters[i].ToString());
+                if (i < requiredEventParameters.Length - 1) {
+                    sb.Append(", ");
+                }
+            }
+            sb.Append(")");
+            return sb.ToString();
+        }
+    }
 
-	/// <summary>
-	/// Cheeseknife! It's like a Butterknife with a weird shape!
-	/// <para></para><para></para>
-	/// Inspired by the extremely helpful Java based Butterknife
-	/// Android library, this helper class allows for easy Android
-	/// view and common event handler injections for Xamarin.Android.
-	/// This injection happens at runtime rather than compile time.
-	/// </summary>
-	public static class Cheeseknife {
-		#region EVENT / METHOD CONSTANTS
-		const string METHOD_NAME_INVOKE = "Invoke";
-		const string METHOD_NAME_RESOLVE_ANDROID_VIEW = "ResolveAndroidView";
-		#endregion
+    /// <summary>
+    /// if the view implements this interface, cheeseknife will call the methods hereby declared 
+    /// before and after the invocation of any method injected by cheeseknife (Click, Touch...)
+    /// </summary>
+    public interface ICheeseKnifeObserver {
 
-		#region PRIVATE CONSTANTS
-		const BindingFlags INJECTION_BINDING_FLAGS = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
-		#endregion
+        /// <summary>
+        /// gets called before the invocation of event handlers
+        /// </summary>
+        /// <param name="eventType">name of the event that has been fired (Click,Touch, etc...)</param>
+        /// <param name="resourceID">resource ID of the view control that fired the event</param>
+        /// <param name="MethodName">name of the event handler CheeseKnife is going to invoke</param>
+        /// <param name="Continue">By setting to false this variable you can prevent the event handler from being executed</param>
+        public void BeforeCheeseKnifeEvent(string eventType, int resourceID, string MethodName, ref bool Continue);
+        /// <summary>
+        /// invoked after the execution of the event handler (it gets called even if the event handler has thrown an exception)
+        /// </summary>
+        /// <param name="eventType">name of the event that has been fired</param>
+        /// <param name="resourceID">resource ID of the view control that fired the event</param>
+        /// <param name="MethodName">name of the event handler that has been invoked</param>
+        /// <param name="exception">not null if the event handler has thrown an exception</param>
+        public void AfterCheeseKnifeEvent(string eventType, int resourceID, string MethodName, Exception? exception);
+    }
 
-		#region PUBLIC API
-		/// <summary>
-		/// Inject the specified parent activity, scanning all class
-		/// member fields and methods for injection attributions. The
-		/// assumption is that the activitie's 'Window.DecorView.RootView'
-		/// represents the root view in the layout hierarchy for the
-		/// given activity.<para></para>
-		/// <para></para>
-		/// Sample activity usage:<para></para>
-		/// <para></para>
-		/// [InjectView(Resource.Id.my_text_view)]<para></para>
-		/// TextView myTextView;<para></para>
-		/// <para></para>
-		/// [InjectOnClick(Resource.Id.my_button)]<para></para>
-		/// void OnMyButtonClick(object sender, EventArgs e) {<para></para>
-		/// . . . myTextView.Text = "I clicked my button!";<para></para>
-		/// }<para></para>
-		/// <para></para>
-		/// protected override void OnCreate(Bundle bundle) {<para></para>
-		/// . . . base.OnCreate(bundle);<para></para>
-		///<para></para>
-		/// . . . SetContentView(Resource.Layout.Main);<para></para>
-		/// . . . Cheeseknife.Inject(this);<para></para>
-		/// <para></para>
-		/// . . . myTextView.Text = "I was injected!";<para></para>
-		/// }<para></para>
-		/// </summary>
-		/// <param name="parent">Parent.</param>
-		public static void Inject(Activity parent) {
-			InjectView(parent, parent.Window.DecorView.RootView);
-		}
+    /// <summary>
+    /// Cheeseknife! It's like a Butterknife with a weird shape!
+    /// <para></para><para></para>
+    /// Inspired by the extremely helpful Java based Butterknife
+    /// Android library, this helper class allows for easy Android
+    /// view and common event handler injections for Xamarin.Android.
+    /// This injection happens at runtime rather than compile time.
+    /// </summary>
+    public static class Cheeseknife {
+        #region EVENT / METHOD CONSTANTS
+        const string METHOD_NAME_INVOKE = "Invoke";
+        const string METHOD_NAME_RESOLVE_ANDROID_VIEW = "ResolveAndroidView";
+        #endregion
 
-		/// <summary>
-		/// Inject the specified parent and view, scanning all class
-		/// member fields and methods for injection attributions.
-		/// This method would normally be called to inject a fragment
-		/// or other arbitrary view container. eg:<para></para>
-		/// <para></para>
-		/// Fragment Example Usage:<para></para>
-		/// <para></para>
-		/// In your OnCreateView method ...<para></para>
-		/// var view = inflater.Inflate(Resource.Layout.fragment, null);<para></para>
-		/// Cheeseknife.Inject(this, view);<para></para>
-		/// return view;<para></para>
-		/// <para></para>
-		/// In your OnDestroyView method ...<para></para>
-		/// Cheeseknife.Reset(this);<para></para>
-		/// </summary>
-		/// <param name="parent">Parent.</param>
-		/// <param name="view">View.</param>
-		public static void Inject(object parent, View view) {
-			InjectView(parent, view);
-		}
+        #region PRIVATE CONSTANTS
+        const BindingFlags INJECTION_BINDING_FLAGS = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
+        #endregion
 
-		/// <summary>
-		/// Reset the specified parent fields to null, which is useful
-		/// within the OnDestroyView fragment lifecycle method, particularly
-		/// if you are using RetainInstance = true.
-		/// </summary>
-		/// <param name="parent">Parent.</param>
-		public static void Reset(object parent) {
-			// Iterate and clear all fields in the parent with the InjectView attribute ...
-			foreach(var field in GetAttributedFields(typeof(InjectView), parent)) {
-				field.SetValue(parent, null);
-			}
+        #region PUBLIC API
+        /// <summary>
+        /// Inject the specified parent activity, scanning all class
+        /// member fields and methods for injection attributions. The
+        /// assumption is that the activitie's 'Window.DecorView.RootView'
+        /// represents the root view in the layout hierarchy for the
+        /// given activity.<para></para>
+        /// <para></para>
+        /// Sample activity usage:<para></para>
+        /// <para></para>
+        /// [InjectView(Resource.Id.my_text_view)]<para></para>
+        /// TextView myTextView;<para></para>
+        /// <para></para>
+        /// [InjectOnClick(Resource.Id.my_button)]<para></para>
+        /// void OnMyButtonClick(object sender, EventArgs e) {<para></para>
+        /// . . . myTextView.Text = "I clicked my button!";<para></para>
+        /// }<para></para>
+        /// <para></para>
+        /// protected override void OnCreate(Bundle bundle) {<para></para>
+        /// . . . base.OnCreate(bundle);<para></para>
+        ///<para></para>
+        /// . . . SetContentView(Resource.Layout.Main);<para></para>
+        /// . . . Cheeseknife.Inject(this);<para></para>
+        /// <para></para>
+        /// . . . myTextView.Text = "I was injected!";<para></para>
+        /// }<para></para>
+        /// </summary>
+        /// <param name="parent">Parent.</param>
+        public static void Inject(Activity parent) {
+            InjectView(parent, parent.Window.DecorView.RootView);
+        }
 
-			// Iterate and clear all properties in the parent with the InjectView attribute ...
-			foreach(var property in GetAttributedProperties(typeof(InjectView), parent)) {
-				property.SetValue(parent, null);
-			}
-		}
-		#endregion
+        /// <summary>
+        /// Inject the specified parent and view, scanning all class
+        /// member fields and methods for injection attributions.
+        /// This method would normally be called to inject a fragment
+        /// or other arbitrary view container. eg:<para></para>
+        /// <para></para>
+        /// Fragment Example Usage:<para></para>
+        /// <para></para>
+        /// In your OnCreateView method ...<para></para>
+        /// var view = inflater.Inflate(Resource.Layout.fragment, null);<para></para>
+        /// Cheeseknife.Inject(this, view);<para></para>
+        /// return view;<para></para>
+        /// <para></para>
+        /// In your OnDestroyView method ...<para></para>
+        /// Cheeseknife.Reset(this);<para></para>
+        /// </summary>
+        /// <param name="parent">Parent.</param>
+        /// <param name="view">View.</param>
+        public static void Inject(object parent, View view) {
+            InjectView(parent, view);
+        }
 
-		#region PRIVATE API
-		/// <summary>
-		/// In order to prevent the linker from stripping out
-		/// the Android UI events, we need to preserve a method
-		/// that references each of the event types we would like
-		/// to keep. Note that this method never actually gets
-		/// called anywhere, but simply marks the event types
-		/// to be preserved. If you want to add other events to
-		/// Cheeseknife, be sure to register dummy events in this
-		/// method to be sure it doesn't get stripped from your
-		/// release builds. Does this feel hacky? Sure does - 
-		/// thankyou Linker!
-		/// </summary>
-		[Preserve]
-		static void InjectionEventPreserver() {
-			new View(null).Click += (s, e) => {};
-			new View(null).LongClick += (s, e) => {};
-			new View(null).FocusChange += (s, e) => {};
-			new View(null).Touch += (s, e) => {};
-			new TextView(null).EditorAction += (s, e) => {};
-			new TextView(null).TextChanged += (s, e) => {};
-			new ListView(null).ItemClick += (s, e) => {};
-			new ListView(null).ItemLongClick += (s, e) => {};
-			new CheckBox(null).CheckedChange += (s, e) => {};
-			new EditText(null).AfterTextChanged += (s, e) => {};
-			new Spinner(null).ItemSelected += (s, e) => {};
-			new SeekBar(null).ProgressChanged += (s, e) => {};
-		}
+        /// <summary>
+        /// Reset the specified parent fields to null, which is useful
+        /// within the OnDestroyView fragment lifecycle method, particularly
+        /// if you are using RetainInstance = true.
+        /// </summary>
+        /// <param name="parent">Parent.</param>
+        public static void Reset(object parent) {
+            // Iterate and clear all fields in the parent with the InjectView attribute ...
+            foreach (var field in GetAttributedFields(typeof(InjectView), parent)) {
+                field.SetValue(parent, null);
+            }
 
-		/// <summary>
-		/// Gets the injection attribute events to iterate through
-		/// when checking for methods to inject in the Android view.
-		/// If you want to add more injectable method types, make
-		/// sure to add a new InjectOnXXXXX class, and register it
-		/// in the dictionary in this method. Also don't forget to
-		/// make sure the linker doesn't strip out your required
-		/// Android UI event type (use the InjectionEventPreserver
-		/// dummy method above to include an event reference so it
-		/// doesn't get linked away in a release build).
-		/// </summary>
-		/// <returns>The injection attribute types.</returns>
-		static Dictionary<Type, string> GetInjectableEvents() {
-			var types = new Dictionary<Type, string>();
+            // Iterate and clear all properties in the parent with the InjectView attribute ...
+            foreach (var property in GetAttributedProperties(typeof(InjectView), parent)) {
+                property.SetValue(parent, null);
+            }
+        }
+        #endregion
 
-			types.Add(typeof(InjectOnClick), "Click");
-			types.Add(typeof(InjectOnItemClick), "ItemClick");
-			types.Add(typeof(InjectOnLongClick), "LongClick");
-			types.Add(typeof(InjectOnItemLongClick), "ItemLongClick");
-			types.Add(typeof(InjectOnFocusChange), "FocusChange");
-			types.Add(typeof(InjectOnCheckedChange), "CheckedChange");
-			types.Add(typeof(InjectOnEditorAction), "EditorAction");
-			types.Add(typeof(InjectOnTouch), "Touch");
-			types.Add(typeof(InjectOnTextChanged), "TextChanged");
-			types.Add(typeof(InjectOnAfterTextChanged), "AfterTextChanged");
-			types.Add(typeof(InjectOnItemSelected), "ItemSelected");
-			types.Add(typeof(InjectOnProgressChanged), "ProgressChanged");
+        #region PRIVATE API
+        /// <summary>
+        /// In order to prevent the linker from stripping out
+        /// the Android UI events, we need to preserve a method
+        /// that references each of the event types we would like
+        /// to keep. Note that this method never actually gets
+        /// called anywhere, but simply marks the event types
+        /// to be preserved. If you want to add other events to
+        /// Cheeseknife, be sure to register dummy events in this
+        /// method to be sure it doesn't get stripped from your
+        /// release builds. Does this feel hacky? Sure does - 
+        /// thankyou Linker!
+        /// </summary>
+        [Preserve]
+        static void InjectionEventPreserver() {
+            new View(null).Click += (s, e) => { };
+            new View(null).LongClick += (s, e) => { };
+            new View(null).FocusChange += (s, e) => { };
+            new View(null).Touch += (s, e) => { };
+            new TextView(null).EditorAction += (s, e) => { };
+            new TextView(null).TextChanged += (s, e) => { };
+            new ListView(null).ItemClick += (s, e) => { };
+            new ListView(null).ItemLongClick += (s, e) => { };
+            new CheckBox(null).CheckedChange += (s, e) => { };
+            new EditText(null).AfterTextChanged += (s, e) => { };
+            new Spinner(null).ItemSelected += (s, e) => { };
+            new SeekBar(null).ProgressChanged += (s, e) => { };
+        }
 
-			return types;
-		}
+        /// <summary>
+        /// Gets the injection attribute events to iterate through
+        /// when checking for methods to inject in the Android view.
+        /// If you want to add more injectable method types, make
+        /// sure to add a new InjectOnXXXXX class, and register it
+        /// in the dictionary in this method. Also don't forget to
+        /// make sure the linker doesn't strip out your required
+        /// Android UI event type (use the InjectionEventPreserver
+        /// dummy method above to include an event reference so it
+        /// doesn't get linked away in a release build).
+        /// </summary>
+        /// <returns>The injection attribute types.</returns>
+        static Dictionary<Type, string> GetInjectableEvents() {
+            var types = new Dictionary<Type, string>();
 
-		/// <summary>
-		/// Gets the attributed fields inside the parent object with
-		/// the matching type of attribute.
-		/// </summary>
-		/// <returns>The attributed fields.</returns>
-		/// <param name="attributeType">Attribute type.</param>
-		/// <param name="parent">Parent.</param>
-		static IEnumerable<FieldInfo> GetAttributedFields(Type attributeType, object parent) {
-			return parent.GetType().GetFields(INJECTION_BINDING_FLAGS).Where(x => x.IsDefined(attributeType));
-		}
+            types.Add(typeof(InjectOnClick), "Click");
+            types.Add(typeof(InjectOnItemClick), "ItemClick");
+            types.Add(typeof(InjectOnLongClick), "LongClick");
+            types.Add(typeof(InjectOnItemLongClick), "ItemLongClick");
+            types.Add(typeof(InjectOnFocusChange), "FocusChange");
+            types.Add(typeof(InjectOnCheckedChange), "CheckedChange");
+            types.Add(typeof(InjectOnEditorAction), "EditorAction");
+            types.Add(typeof(InjectOnTouch), "Touch");
+            types.Add(typeof(InjectOnTextChanged), "TextChanged");
+            types.Add(typeof(InjectOnAfterTextChanged), "AfterTextChanged");
+            types.Add(typeof(InjectOnItemSelected), "ItemSelected");
+            types.Add(typeof(InjectOnProgressChanged), "ProgressChanged");
 
-		/// <summary>
-		/// Gets the attributed properties inside the parent object with
-		/// the matching type of attribute.
-		/// </summary>
-		/// <returns>The attributed properties.</returns>
-		/// <param name="attributeType">Attribute type.</param>
-		/// <param name="parent">Parent.</param>
-		static IEnumerable<PropertyInfo> GetAttributedProperties(Type attributeType, object parent) {
-			return parent.GetType().GetProperties(INJECTION_BINDING_FLAGS).Where(x => x.IsDefined(attributeType));
-		}
+            return types;
+        }
 
-		/// <summary>
-		/// Gets the attributed methods inside the parent object with
-		/// the matching type of attribute.
-		/// </summary>
-		/// <returns>The attributed methods.</returns>
-		/// <param name="attributeType">Attribute type.</param>
-		/// <param name="parent">Parent.</param>
-		static IEnumerable<MethodInfo> GetAttributedMethods(Type attributeType, object parent) {
-			return parent.GetType().GetMethods(INJECTION_BINDING_FLAGS).Where(x => x.IsDefined(attributeType));
-		}
+        /// <summary>
+        /// Gets the attributed fields inside the parent object with
+        /// the matching type of attribute.
+        /// </summary>
+        /// <returns>The attributed fields.</returns>
+        /// <param name="attributeType">Attribute type.</param>
+        /// <param name="parent">Parent.</param>
+        static IEnumerable<FieldInfo> GetAttributedFields(Type attributeType, object parent) {
+            return parent.GetType().GetFields(INJECTION_BINDING_FLAGS).Where(x => x.IsDefined(attributeType));
+        }
 
-		/// <summary>
-		/// Resolves an android view to a specific view type. This is
-		/// needed to allow custom Android view classes to resolve
-		/// correctly (eg, Com.Android.Volley.NetworkImageView etc).
-		/// </summary>
-		/// <returns>The android view.</returns>
-		/// <param name="view">Parent view to resolve view from.</param>
-		/// <param name="resourceId">Resource identifier.</param>
-		/// <typeparam name="T">The required specific Android view type.</typeparam>
-		static T ResolveAndroidView<T>(View view, int resourceId) where T : View {
-			return view.FindViewById<T>(resourceId);
-		}
+        /// <summary>
+        /// Gets the attributed properties inside the parent object with
+        /// the matching type of attribute.
+        /// </summary>
+        /// <returns>The attributed properties.</returns>
+        /// <param name="attributeType">Attribute type.</param>
+        /// <param name="parent">Parent.</param>
+        static IEnumerable<PropertyInfo> GetAttributedProperties(Type attributeType, object parent) {
+            return parent.GetType().GetProperties(INJECTION_BINDING_FLAGS).Where(x => x.IsDefined(attributeType));
+        }
 
-		/// <summary>
-		/// Injects the parent class by iterating over all of its
-		/// fields, properties and methods, checking if they have
-		/// injection attributes. For any fields/props/methods that
-		/// have injection attributes do the following:<para></para>
-		/// <para></para>
-		/// 1. If it is a field/prop -> attempt to resolve the actual
-		/// Android widget in the given view and assign it as the
-		/// field value, effectively 'injecting' it.<para></para>
-		/// <para></para>
-		/// 2. If it is a method -> attempt to apply an event
-		/// handler of the related type to the widget identified
-		/// by the resource id specified in the attribute. Some
-		/// widget types are verified before applying the events.
-		/// </summary>
-		/// <param name="parent">Parent.</param>
-		/// <param name="view">View.</param>
-		static void InjectView(object parent, View view) {
-			var resolveMethod = typeof(Cheeseknife).GetMethod(METHOD_NAME_RESOLVE_ANDROID_VIEW, BindingFlags.Static | BindingFlags.NonPublic);
+        /// <summary>
+        /// Gets the attributed methods inside the parent object with
+        /// the matching type of attribute.
+        /// </summary>
+        /// <returns>The attributed methods.</returns>
+        /// <param name="attributeType">Attribute type.</param>
+        /// <param name="parent">Parent.</param>
+        static IEnumerable<MethodInfo> GetAttributedMethods(Type attributeType, object parent) {
+            return parent.GetType().GetMethods(INJECTION_BINDING_FLAGS).Where(x => x.IsDefined(attributeType));
+        }
 
-			// Grab all the instance fields in the parent class that have custom attributes
-			// For each field, check whether it has the InjectView attribute
-			foreach(var field in GetAttributedFields(typeof(InjectView), parent)) {
-				var attribute = field.GetCustomAttribute<InjectView>();
-				var genericMethod = resolveMethod.MakeGenericMethod(field.FieldType);
-				var widget = genericMethod.Invoke(parent, new object[] { view, attribute.ResourceId });
-				field.SetValue(parent, widget);
-			}
+        /// <summary>
+        /// Resolves an android view to a specific view type. This is
+        /// needed to allow custom Android view classes to resolve
+        /// correctly (eg, Com.Android.Volley.NetworkImageView etc).
+        /// </summary>
+        /// <returns>The android view.</returns>
+        /// <param name="view">Parent view to resolve view from.</param>
+        /// <param name="resourceId">Resource identifier.</param>
+        /// <typeparam name="T">The required specific Android view type.</typeparam>
+        static T ResolveAndroidView<T>(View view, int resourceId) where T : View {
+            return view.FindViewById<T>(resourceId);
+        }
 
-			// Grab all the properties in the parent class that have custom attributes
-			// For each field, check whether it has the InjectView attribute
-			foreach(var property in GetAttributedProperties(typeof(InjectView), parent)) {
-				var attribute = property.GetCustomAttribute<InjectView>();
-				var genericMethod = resolveMethod.MakeGenericMethod(property.PropertyType);
-				var widget = genericMethod.Invoke(parent, new object[] { view, attribute.ResourceId });
-				property.SetValue(parent, widget);
-			}
+        /// <summary>
+        /// Injects the parent class by iterating over all of its
+        /// fields, properties and methods, checking if they have
+        /// injection attributes. For any fields/props/methods that
+        /// have injection attributes do the following:<para></para>
+        /// <para></para>
+        /// 1. If it is a field/prop -> attempt to resolve the actual
+        /// Android widget in the given view and assign it as the
+        /// field value, effectively 'injecting' it.<para></para>
+        /// <para></para>
+        /// 2. If it is a method -> attempt to apply an event
+        /// handler of the related type to the widget identified
+        /// by the resource id specified in the attribute. Some
+        /// widget types are verified before applying the events.
+        /// </summary>
+        /// <param name="parent">Parent.</param>
+        /// <param name="view">View.</param>
+        static void InjectView(object parent, View view) {
+            var resolveMethod = typeof(Cheeseknife).GetMethod(METHOD_NAME_RESOLVE_ANDROID_VIEW, BindingFlags.Static | BindingFlags.NonPublic);
 
-			// Retrieve all our registered Attribute/Event types to scan
-			foreach(var injectableEvent in GetInjectableEvents()) {
-				// Get the current type of injection attribute to process
-				var attributeType = injectableEvent.Key;
-				// Get the name of the event to apply for this injection
-				var eventName = injectableEvent.Value;
-				// Find any methods in the parent class that have the current injection attribute
-				//var methods = parentType.GetMethods(bindingFlags).Where(x => x.IsDefined(attributeType));
-				var methods = GetAttributedMethods(attributeType, parent);
-				// Loop through each method with the current injection attribute
-				foreach(var method in methods) {
-					// And inject an event handler on it!
-					InjectMethod(attributeType, method, parent, view, eventName);
-				}
-			}
-		}
+            // Grab all the instance fields in the parent class that have custom attributes
+            // For each field, check whether it has the InjectView attribute
+            foreach (var field in GetAttributedFields(typeof(InjectView), parent)) {
+                var attribute = field.GetCustomAttribute<InjectView>();
+                var genericMethod = resolveMethod.MakeGenericMethod(field.FieldType);
+                var widget = genericMethod.Invoke(parent, new object[] { view, attribute.ResourceId });
+                field.SetValue(parent, widget);
+            }
 
-		/// <summary>
-		/// Injects a method by mapping the appropriate event handler to
-		/// the user's attributed receiving method.
-		/// </summary>
-		/// <param name="attributeType">Attribute Type.</param>
-		/// <param name="method">Method.</param>
-		/// <param name="parent">Parent.</param>
-		/// <param name="view">View.</param>
-		/// <param name="eventName">Event name.</param>
-		static void InjectMethod(Type attributeType, MethodInfo method, object parent, View view, string eventName) {
-			// Check whether the provided method has the attribute represented by attributeType
-			var attribute = method.GetCustomAttribute(attributeType, false) as BaseInjectionAttribute;
-			// If the attribute can't be found, exit ...
-			if(attribute == null) {
-				return;
-			}
+            // Grab all the properties in the parent class that have custom attributes
+            // For each field, check whether it has the InjectView attribute
+            foreach (var property in GetAttributedProperties(typeof(InjectView), parent)) {
+                var attribute = property.GetCustomAttribute<InjectView>();
+                var genericMethod = resolveMethod.MakeGenericMethod(property.PropertyType);
+                var widget = genericMethod.Invoke(parent, new object[] { view, attribute.ResourceId });
+                property.SetValue(parent, widget);
+            }
 
-			// Get a reference to the Android UI object with the attributed resource id
-			var widget = view.FindViewById<View>(attribute.ResourceId);
+            // Retrieve all our registered Attribute/Event types to scan
+            foreach (var injectableEvent in GetInjectableEvents()) {
+                // Get the current type of injection attribute to process
+                var attributeType = injectableEvent.Key;
+                // Get the name of the event to apply for this injection
+                var eventName = injectableEvent.Value;
+                // Find any methods in the parent class that have the current injection attribute
+                //var methods = parentType.GetMethods(bindingFlags).Where(x => x.IsDefined(attributeType));
+                var methods = GetAttributedMethods(attributeType, parent);
+                // Loop through each method with the current injection attribute
+                foreach (var method in methods) {
+                    // And inject an event handler on it!
+                    InjectMethod(attributeType, method, parent, view, eventName);
+                }
+            }
+        }
 
-			if (widget == null) {
-				throw new CheeseknifeException(attribute.ResourceId, method.Name);
-			}
+        /// <summary>
+        /// Injects a method by mapping the appropriate event handler to
+        /// the user's attributed receiving method.
+        /// </summary>
+        /// <param name="attributeType">Attribute Type.</param>
+        /// <param name="method">Method.</param>
+        /// <param name="parent">Parent.</param>
+        /// <param name="view">View.</param>
+        /// <param name="eventName">Event name.</param>
+        static void InjectMethod(Type attributeType, MethodInfo method, object parent, View view, string eventName) {
+            // Check whether the provided method has the attribute represented by attributeType
+            var attribute = method.GetCustomAttribute(attributeType, false) as BaseInjectionAttribute;
+            // If the attribute can't be found, exit ...
+            if (attribute == null) {
+                return;
+            }
+
+            // Get a reference to the Android UI object with the attributed resource id
+            var widget = view.FindViewById<View>(attribute.ResourceId);
+
+            if (widget == null) {
+                throw new CheeseknifeException(attribute.ResourceId, method.Name);
+            }
 
 
-			// Attempt to find the given event name on the widget.
-			// If the event cannot be found, then we can't do anything
-			// further ...
-			var eventInfo = widget.GetType().GetEvent(eventName);
-			if(eventInfo == null) {
-				throw new CheeseknifeException(widget.GetType(), eventName);
-			}
+            // Attempt to find the given event name on the widget.
+            // If the event cannot be found, then we can't do anything
+            // further ...
+            var eventInfo = widget.GetType().GetEvent(eventName);
+            if (eventInfo == null) {
+                throw new CheeseknifeException(widget.GetType(), eventName);
+            }
 
-			// Get a list of all the user defined attributed method parameters, and the event type parameters
-			var methodParameterTypes = method.GetParameters().Select(p => p.ParameterType).ToArray();
-			var eventParameterTypes = eventInfo.EventHandlerType.GetMethod(METHOD_NAME_INVOKE).GetParameters().Select(p => p.ParameterType).ToArray();
+            // Get a list of all the user defined attributed method parameters, and the event type parameters
+            var methodParameterTypes = method.GetParameters().Select(p => p.ParameterType).ToArray();
+            var eventParameterTypes = eventInfo.EventHandlerType.GetMethod(METHOD_NAME_INVOKE).GetParameters().Select(p => p.ParameterType).ToArray();
 
-			// If the user method doesn't define the same number of parameters as the event type, bail ...
-			if(methodParameterTypes.Length != eventParameterTypes.Length) {
-				throw new CheeseknifeException(method.Name, eventParameterTypes);
-			}
+            // If the user method doesn't define the same number of parameters as the event type, bail ...
+            if (methodParameterTypes.Length != eventParameterTypes.Length) {
+                throw new CheeseknifeException(method.Name, eventParameterTypes);
+            }
 
-			// Step through the method parameters and event type parameters and make sure the Type of each param matches.
-			for(var i = 0; i < methodParameterTypes.Length; i++) {
-				if(methodParameterTypes[i] != eventParameterTypes[i]) {
-					throw new CheeseknifeException(method.Name, eventParameterTypes);
-				}
-			}
+            // Step through the method parameters and event type parameters and make sure the Type of each param matches.
+            for (var i = 0; i < methodParameterTypes.Length; i++) {
+                if (methodParameterTypes[i] != eventParameterTypes[i]) {
+                    throw new CheeseknifeException(method.Name, eventParameterTypes);
+                }
+            }
 
-			// If we reach this stage, the user method should be able to correctly consume the dispatched event
-			// so simply create a new delegate method call and add it to the Android UI object's event handler.
-			var handler = Delegate.CreateDelegate(eventInfo.EventHandlerType, parent, method);
-			eventInfo.AddEventHandler(widget, handler);
-		}
-		#endregion
-	}
+            var launcher = new CheeseKnifeMethodWrapper(eventInfo, eventName, attribute.ResourceId, parent, method);
+            var handler = launcher.GetDelegate();
+
+            eventInfo.AddEventHandler(widget, handler);
+        }
+
+
+        private class CheeseKnifeMethodWrapper {
+            private readonly EventInfo EventInfo;
+            private readonly string EventName;
+            private readonly int ResourceID;
+            private readonly ICheeseKnifeObserver? Observer;
+            private readonly object Parent;
+            private readonly MethodInfo Method;
+
+            public CheeseKnifeMethodWrapper(EventInfo eventInfo, string eventName, int resourceID, object parent, MethodInfo method) {
+                EventInfo = eventInfo;
+                EventName = eventName;
+                ResourceID = resourceID;
+                Parent = parent;
+                Observer = parent as ICheeseKnifeObserver;
+                Method = method;
+            }
+
+            /// <summary>
+            /// this launcher is used when the event handler is declared as "async Task" and parent implements ICheeseKnifeObserver
+            /// </summary>
+            /// <param name="sender"></param>
+            /// <param name="args"></param>
+            public async void ObservableAsyncEventLauncher(object sender, EventArgs args) {
+                var Continue = true;
+                Observer!.BeforeCheeseKnifeEvent(EventName, ResourceID, Method.Name, ref Continue);
+                if (!Continue)
+                    return;
+
+                try {
+                    Task tsk = (Task)Method.Invoke(Parent, new object[] { sender, args });
+                    await tsk;
+                    Observer.AfterCheeseKnifeEvent(EventName, ResourceID, Method.Name, null);
+                }
+                catch (Exception e) {
+                    Observer.AfterCheeseKnifeEvent(EventName, ResourceID, Method.Name, e);
+                    throw;
+                }
+            }
+
+            /// <summary>
+            /// this launcher is used when the event handler is declared as "void"  and parent implements ICheeseKnifeObserver
+            /// (note: it is used also when the event handler is declared as async void, but this declaration should not be used
+            /// in conjunction with ICheeseKnifeObserver because the AfterCheeseKnifeEvent method will be fired immediately
+            /// without waiting for the event handler termination (there is no way to wait for the termination of an async void method)
+            /// </summary>
+            public void ObservableEventLauncher(object sender, EventArgs args) {
+                var Continue = true;
+                Observer!.BeforeCheeseKnifeEvent(EventName, ResourceID, Method.Name, ref Continue);
+                if (!Continue)
+                    return;
+
+                try {
+                    Method.Invoke(Parent, new object[] { sender, args });
+                    Observer.AfterCheeseKnifeEvent(EventName, ResourceID, Method.Name, null);
+                }
+                catch (Exception e) {
+                    Observer.AfterCheeseKnifeEvent(EventName, ResourceID, Method.Name, e);
+                    throw;
+                }
+            }
+
+            /// <summary>
+            /// this launcher is used when the event handler is declared as "async Task" but the parent does NOT implements ICheeseKnifeObserver
+            /// (it is necessary to use a launcher in order to "await" for the task, otherwise exceptions thrown within the method would be hidden
+            /// </summary>
+            /// <param name="sender"></param>
+            /// <param name="args"></param>
+            public async void NotObservableAsyncEventLauncher(object sender, EventArgs args) {
+                Task tsk = (Task)Method.Invoke(Parent, new object[] { sender, args });
+                await tsk;
+            }
+
+
+            internal Delegate GetDelegate() {
+                var isAsync = typeof(Task).IsAssignableFrom(Method.ReturnType);
+
+                string nameOfLauncherToBeUsed;
+
+                if (Observer != null)
+                    nameOfLauncherToBeUsed = isAsync ? nameof(ObservableAsyncEventLauncher) : nameof(ObservableEventLauncher);
+                else if (isAsync)
+                    nameOfLauncherToBeUsed = nameof(NotObservableAsyncEventLauncher);
+                else {
+                    // if the method is not async and there is no ICheeseKnifeObserver implementation
+                    // there is no need to wrap the method to be called inside an method:
+                    // it can be used directly as is
+                    return Delegate.CreateDelegate(EventInfo.EventHandlerType, Parent, Method);
+                }
+
+                var launcherMethodInfo = typeof(CheeseKnifeMethodWrapper).GetMethod(nameOfLauncherToBeUsed);
+                var result = Delegate.CreateDelegate(EventInfo.EventHandlerType, this, launcherMethodInfo);
+                return result;
+            }
+        }
+        #endregion
+    }
 }
