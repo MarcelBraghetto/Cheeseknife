@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:showIn="@layout/activity_main">
+    
+
+    <Button
+      android:id="@+id/clickMe1" 
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="Click Me!"
+    />
+    <TextView
+       android:id="@+id/eventHandler1Indicator"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"     
+       android:text="Event Handler 1 is still running!"
+       android:layout_alignBaseline="@id/clickMe1"
+       android:layout_toRightOf="@id/clickMe1"
+       android:padding="3dp"    
+     /> 
+
+    <Button
+      android:id="@+id/clickMe2" 
+      android:layout_below="@id/clickMe1"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="Click Me!"
+    />
+    <TextView
+       android:id="@+id/eventHandler2Indicator"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"     
+       android:text="Event Handler 2 is still running!"
+       android:layout_alignBaseline="@id/clickMe2"
+       android:layout_toRightOf="@id/clickMe2"
+       android:padding="3dp" 
+    
+     /> 
+
+
+    <TextView
+       android:id="@+id/logTitle"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_below="@id/clickMe2"
+       android:layout_centerHorizontal="true"
+       android:text="EVENTS INTERCEPTED BY ICheeseKnifeObserver:"
+    />
+    <TextView
+        android:id="@+id/log"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/logTitle"
+        android:layout_alignParentBottom="true" 
+        android:layout_centerInParent="true"
+        android:padding="3dp"
+        android:scrollbars="vertical"
+        android:text="ICheeseKnifeObservable output goes here"/>
+
+</RelativeLayout>

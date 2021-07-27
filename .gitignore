@@ -15,3 +15,5 @@ obj/
 
 Components
 packages
+*.user
+.vs/
