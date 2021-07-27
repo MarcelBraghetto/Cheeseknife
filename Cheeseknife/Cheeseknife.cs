@@ -24,8 +24,10 @@ using Android.Widget;
 using System.Text;
 using Android.Runtime;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Com.Lilarcor.Cheeseknife {
+
 	/// <summary>
 	/// Base injection attribute, to include a ResourceId
 	/// which should refer to an Android view resource id.
@@ -45,7 +47,7 @@ namespace Com.Lilarcor.Cheeseknife {
 	/// permitted on instance fields.
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-	public class InjectView : BaseInjectionAttribute {	
+	public class InjectView : BaseInjectionAttribute {
 		public InjectView(int resourceId) : base(resourceId) { }
 	}
 
@@ -177,8 +179,8 @@ namespace Com.Lilarcor.Cheeseknife {
 	/// void SomeMethodName(object sender, SeekBar.ProgressChangedEventArgs e) { ... }
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Method)]
-        public class InjectOnProgressChanged: BaseInjectionAttribute {
-	    	public InjectOnProgressChanged(int resourceId) : base(resourceId) { }
+	public class InjectOnProgressChanged : BaseInjectionAttribute {
+		public InjectOnProgressChanged(int resourceId) : base(resourceId) { }
 	}
 
 	/// <summary>
@@ -198,12 +200,21 @@ namespace Com.Lilarcor.Cheeseknife {
 		public CheeseknifeException(Type viewType, string eventName) : base(GetViewTypeExceptionMessage(viewType, eventName)) { }
 
 		/// <summary>
+		/// Call this constructor with an Android resource id and a method name
+		/// event name to indicate there is no view having the specified resource id
+		/// to which inject the annotated event handler 
+		/// </summary>
+		/// <param name="resourceId">Resource.Id of the missing View</param>
+		/// <param name="methodName">name of method that was requested to inject as a event handler</param>
+		public CheeseknifeException(int resourceId, string methodName) : base(GetViewTypeExceptionMessage(resourceId, methodName)) { }
+
+		/// <summary>
 		/// Call this constructor with a list of required event type 
 		/// parameters to indicate that the parameters couldn't be found
 		/// or matched to the signature of the user attributed method.
 		/// </summary>
 		/// <param name="requiredEventParameters">Required event types.</param>
-		public CheeseknifeException(Type[] requiredEventParameters) : base(GetArgumentTypeExceptionMessage(requiredEventParameters)) { }
+		public CheeseknifeException(string methodName, Type[] requiredEventParameters) : base(GetArgumentTypeExceptionMessage(methodName, requiredEventParameters)) { }
 
 		/// <summary>
 		/// Gets the view type exception message for an Android view class
@@ -224,6 +235,24 @@ namespace Com.Lilarcor.Cheeseknife {
 		}
 
 		/// <summary>
+		/// Gets the exception message for a event handler that could not be
+		/// injected because the corresponding view was not found
+		/// </summary>
+		/// <returns>The exception message.</returns>
+		/// <param name="resourceId">the Resource.Id for which we didn't find a corresponding view.</param>
+		/// <param name="methodName">the name of the method that should have been used as a event handler for the missing view.</param>
+		static string GetViewTypeExceptionMessage(int resourceId, string methodName) {
+			var sb = new StringBuilder();
+			sb.Append(PREFIX);
+			sb.Append(" Could not find the view having resource id=");
+			sb.Append(resourceId);
+			sb.Append(" for event handler '");
+			sb.Append(methodName);
+			sb.Append("'");
+			return sb.ToString();
+		}
+
+		/// <summary>
 		/// Gets the argument type exception message when the user attributed
 		/// method doesn't have the same number of parameters as the specified
 		/// event signature, or the parameter types don't match between the
@@ -231,19 +260,45 @@ namespace Com.Lilarcor.Cheeseknife {
 		/// </summary>
 		/// <returns>The argument type exception message.</returns>
 		/// <param name="requiredEventParameters">Required event parameters.</param>
-		static string GetArgumentTypeExceptionMessage(Type[] requiredEventParameters) {
+		static string GetArgumentTypeExceptionMessage(string methodName, Type[] requiredEventParameters) {
 			var sb = new StringBuilder();
 			sb.Append(PREFIX);
-			sb.Append(" Incorrect arguments in receiving method, should be => (");
-			for(var i = 0; i < requiredEventParameters.Length; i++) {
+			sb.Append(" Incorrect arguments in receiving method ");
+			sb.Append(methodName);
+			sb.Append(", should be => (");
+			for (var i = 0; i < requiredEventParameters.Length; i++) {
 				sb.Append(requiredEventParameters[i].ToString());
-				if(i < requiredEventParameters.Length - 1) {
+				if (i < requiredEventParameters.Length - 1) {
 					sb.Append(", ");
 				}
 			}
 			sb.Append(")");
 			return sb.ToString();
 		}
+	}
+
+	/// <summary>
+	/// if the view implements this interface, cheeseknife will call the methods hereby declared 
+	/// before and after the invocation of any method injected by cheeseknife (Click, Touch...)
+	/// </summary>
+	public interface ICheeseKnifeObserver {
+
+		/// <summary>
+		/// gets called before the invocation of event handlers
+		/// </summary>
+		/// <param name="eventType">name of the event that has been fired (Click,Touch, etc...)</param>
+		/// <param name="resourceID">resource ID of the view control that fired the event</param>
+		/// <param name="MethodName">name of the event handler CheeseKnife is going to invoke</param>
+		/// <param name="Continue">By setting to false this variable you can prevent the event handler from being executed</param>
+		public void BeforeCheeseKnifeEvent(string eventType, int resourceID, string MethodName, ref bool Continue);
+		/// <summary>
+		/// invoked after the execution of the event handler (it gets called even if the event handler has thrown an exception)
+		/// </summary>
+		/// <param name="eventType">name of the event that has been fired</param>
+		/// <param name="resourceID">resource ID of the view control that fired the event</param>
+		/// <param name="MethodName">name of the event handler that has been invoked</param>
+		/// <param name="exception">not null if the event handler has thrown an exception</param>
+		public void AfterCheeseKnifeEvent(string eventType, int resourceID, string MethodName, Exception? exception);
 	}
 
 	/// <summary>
@@ -326,12 +381,12 @@ namespace Com.Lilarcor.Cheeseknife {
 		/// <param name="parent">Parent.</param>
 		public static void Reset(object parent) {
 			// Iterate and clear all fields in the parent with the InjectView attribute ...
-			foreach(var field in GetAttributedFields(typeof(InjectView), parent)) {
+			foreach (var field in GetAttributedFields(typeof(InjectView), parent)) {
 				field.SetValue(parent, null);
 			}
 
 			// Iterate and clear all properties in the parent with the InjectView attribute ...
-			foreach(var property in GetAttributedProperties(typeof(InjectView), parent)) {
+			foreach (var property in GetAttributedProperties(typeof(InjectView), parent)) {
 				property.SetValue(parent, null);
 			}
 		}
@@ -352,18 +407,18 @@ namespace Com.Lilarcor.Cheeseknife {
 		/// </summary>
 		[Preserve]
 		static void InjectionEventPreserver() {
-			new View(null).Click += (s, e) => {};
-			new View(null).LongClick += (s, e) => {};
-			new View(null).FocusChange += (s, e) => {};
-			new View(null).Touch += (s, e) => {};
-			new TextView(null).EditorAction += (s, e) => {};
-			new TextView(null).TextChanged += (s, e) => {};
-			new ListView(null).ItemClick += (s, e) => {};
-			new ListView(null).ItemLongClick += (s, e) => {};
-			new CheckBox(null).CheckedChange += (s, e) => {};
-			new EditText(null).AfterTextChanged += (s, e) => {};
-			new Spinner(null).ItemSelected += (s, e) => {};
-			new SeekBar(null).ProgressChanged += (s, e) => {};
+			new View(null).Click += (s, e) => { };
+			new View(null).LongClick += (s, e) => { };
+			new View(null).FocusChange += (s, e) => { };
+			new View(null).Touch += (s, e) => { };
+			new TextView(null).EditorAction += (s, e) => { };
+			new TextView(null).TextChanged += (s, e) => { };
+			new ListView(null).ItemClick += (s, e) => { };
+			new ListView(null).ItemLongClick += (s, e) => { };
+			new CheckBox(null).CheckedChange += (s, e) => { };
+			new EditText(null).AfterTextChanged += (s, e) => { };
+			new Spinner(null).ItemSelected += (s, e) => { };
+			new SeekBar(null).ProgressChanged += (s, e) => { };
 		}
 
 		/// <summary>
@@ -465,7 +520,7 @@ namespace Com.Lilarcor.Cheeseknife {
 
 			// Grab all the instance fields in the parent class that have custom attributes
 			// For each field, check whether it has the InjectView attribute
-			foreach(var field in GetAttributedFields(typeof(InjectView), parent)) {
+			foreach (var field in GetAttributedFields(typeof(InjectView), parent)) {
 				var attribute = field.GetCustomAttribute<InjectView>();
 				var genericMethod = resolveMethod.MakeGenericMethod(field.FieldType);
 				var widget = genericMethod.Invoke(parent, new object[] { view, attribute.ResourceId });
@@ -474,7 +529,7 @@ namespace Com.Lilarcor.Cheeseknife {
 
 			// Grab all the properties in the parent class that have custom attributes
 			// For each field, check whether it has the InjectView attribute
-			foreach(var property in GetAttributedProperties(typeof(InjectView), parent)) {
+			foreach (var property in GetAttributedProperties(typeof(InjectView), parent)) {
 				var attribute = property.GetCustomAttribute<InjectView>();
 				var genericMethod = resolveMethod.MakeGenericMethod(property.PropertyType);
 				var widget = genericMethod.Invoke(parent, new object[] { view, attribute.ResourceId });
@@ -482,7 +537,7 @@ namespace Com.Lilarcor.Cheeseknife {
 			}
 
 			// Retrieve all our registered Attribute/Event types to scan
-			foreach(var injectableEvent in GetInjectableEvents()) {
+			foreach (var injectableEvent in GetInjectableEvents()) {
 				// Get the current type of injection attribute to process
 				var attributeType = injectableEvent.Key;
 				// Get the name of the event to apply for this injection
@@ -491,7 +546,7 @@ namespace Com.Lilarcor.Cheeseknife {
 				//var methods = parentType.GetMethods(bindingFlags).Where(x => x.IsDefined(attributeType));
 				var methods = GetAttributedMethods(attributeType, parent);
 				// Loop through each method with the current injection attribute
-				foreach(var method in methods) {
+				foreach (var method in methods) {
 					// And inject an event handler on it!
 					InjectMethod(attributeType, method, parent, view, eventName);
 				}
@@ -511,18 +566,23 @@ namespace Com.Lilarcor.Cheeseknife {
 			// Check whether the provided method has the attribute represented by attributeType
 			var attribute = method.GetCustomAttribute(attributeType, false) as BaseInjectionAttribute;
 			// If the attribute can't be found, exit ...
-			if(attribute == null) {
+			if (attribute == null) {
 				return;
 			}
 
 			// Get a reference to the Android UI object with the attributed resource id
 			var widget = view.FindViewById<View>(attribute.ResourceId);
 
+			if (widget == null) {
+				throw new CheeseknifeException(attribute.ResourceId, method.Name);
+			}
+
+
 			// Attempt to find the given event name on the widget.
 			// If the event cannot be found, then we can't do anything
 			// further ...
 			var eventInfo = widget.GetType().GetEvent(eventName);
-			if(eventInfo == null) {
+			if (eventInfo == null) {
 				throw new CheeseknifeException(widget.GetType(), eventName);
 			}
 
@@ -531,21 +591,117 @@ namespace Com.Lilarcor.Cheeseknife {
 			var eventParameterTypes = eventInfo.EventHandlerType.GetMethod(METHOD_NAME_INVOKE).GetParameters().Select(p => p.ParameterType).ToArray();
 
 			// If the user method doesn't define the same number of parameters as the event type, bail ...
-			if(methodParameterTypes.Length != eventParameterTypes.Length) {
-				throw new CheeseknifeException(eventParameterTypes);
+			if (methodParameterTypes.Length != eventParameterTypes.Length) {
+				throw new CheeseknifeException(method.Name, eventParameterTypes);
 			}
 
 			// Step through the method parameters and event type parameters and make sure the Type of each param matches.
-			for(var i = 0; i < methodParameterTypes.Length; i++) {
-				if(methodParameterTypes[i] != eventParameterTypes[i]) {
-					throw new CheeseknifeException(eventParameterTypes);
+			for (var i = 0; i < methodParameterTypes.Length; i++) {
+				if (methodParameterTypes[i] != eventParameterTypes[i]) {
+					throw new CheeseknifeException(method.Name, eventParameterTypes);
 				}
 			}
 
-			// If we reach this stage, the user method should be able to correctly consume the dispatched event
-			// so simply create a new delegate method call and add it to the Android UI object's event handler.
-			var handler = Delegate.CreateDelegate(eventInfo.EventHandlerType, parent, method);
+			var launcher = new CheeseKnifeMethodWrapper(eventInfo, eventName, attribute.ResourceId, parent, method);
+			var handler = launcher.GetDelegate();
+
 			eventInfo.AddEventHandler(widget, handler);
+		}
+
+
+		private class CheeseKnifeMethodWrapper {
+			private readonly EventInfo EventInfo;
+			private readonly string EventName;
+			private readonly int ResourceID;
+			private readonly ICheeseKnifeObserver? Observer;
+			private readonly object Parent;
+			private readonly MethodInfo Method;
+
+			public CheeseKnifeMethodWrapper(EventInfo eventInfo, string eventName, int resourceID, object parent, MethodInfo method) {
+				EventInfo = eventInfo;
+				EventName = eventName;
+				ResourceID = resourceID;
+				Parent = parent;
+				Observer = parent as ICheeseKnifeObserver;
+				Method = method;
+			}
+
+			/// <summary>
+			/// this launcher is used when the event handler is declared as "async Task" and parent implements ICheeseKnifeObserver
+			/// </summary>
+			/// <param name="sender"></param>
+			/// <param name="args"></param>
+			public async void ObservableAsyncEventLauncher(object sender, EventArgs args) {
+				var Continue = true;
+				Observer!.BeforeCheeseKnifeEvent(EventName, ResourceID, Method.Name, ref Continue);
+				if (!Continue)
+					return;
+
+				try {
+					Task tsk = (Task)Method.Invoke(Parent, new object[] { sender, args });
+					await tsk;
+					Observer.AfterCheeseKnifeEvent(EventName, ResourceID, Method.Name, null);
+				}
+				catch (Exception e) {
+					Observer.AfterCheeseKnifeEvent(EventName, ResourceID, Method.Name, e);
+					throw;
+				}
+			}
+
+			/// <summary>
+			/// this launcher is used when the event handler is declared as "void"  and parent implements ICheeseKnifeObserver
+			/// (note: it is used also when the event handler is declared as async void, but this declaration should not be used
+			/// in conjunction with ICheeseKnifeObserver because the AfterCheeseKnifeEvent method will be fired immediately
+			/// without waiting for the event handler termination (there is no way to wait for the termination of an async void method)
+			/// </summary>
+			public void ObservableEventLauncher(object sender, EventArgs args) {
+				var Continue = true;
+				Observer!.BeforeCheeseKnifeEvent(EventName, ResourceID, Method.Name, ref Continue);
+				if (!Continue)
+					return;
+
+				try {
+					Method.Invoke(Parent, new object[] { sender, args });
+					Observer.AfterCheeseKnifeEvent(EventName, ResourceID, Method.Name, null);
+				}
+				catch (Exception e) {
+					Observer.AfterCheeseKnifeEvent(EventName, ResourceID, Method.Name, e);
+					throw;
+				}
+			}
+
+			/// <summary>
+			/// this launcher is used when the event handler is declared as "async Task" but the parent does NOT implements ICheeseKnifeObserver
+			/// (it is necessary to use a launcher in order to "await" for the task, otherwise exceptions thrown within the method would be hidden
+			/// </summary>
+			/// <param name="sender"></param>
+			/// <param name="args"></param>
+			public async void NotObservableAsyncEventLauncher(object sender, EventArgs args) {
+				Task tsk = (Task)Method.Invoke(Parent, new object[] { sender, args });
+				await tsk;
+			}
+
+
+			internal Delegate GetDelegate() {
+				var isAsync = typeof(Task).IsAssignableFrom(Method.ReturnType);
+
+				string nameOfLauncherToBeUsed;
+
+				if (Observer != null)
+					nameOfLauncherToBeUsed = isAsync ? nameof(ObservableAsyncEventLauncher) : nameof(ObservableEventLauncher);
+				else if (isAsync)
+					nameOfLauncherToBeUsed = nameof(NotObservableAsyncEventLauncher);
+				else {
+					// if the method is not async and there is no ICheeseKnifeObserver implementation
+					// there is no need to wrap the method to be called inside an method:
+					// it can be used directly as is
+					return Delegate.CreateDelegate(EventInfo.EventHandlerType, Parent, Method);
+				}
+
+				var launcherMethodInfo = typeof(CheeseKnifeMethodWrapper).GetMethod(nameOfLauncherToBeUsed);
+				var result = Delegate.CreateDelegate(EventInfo.EventHandlerType, this, launcherMethodInfo);
+				return result;
+			}
 		}
 		#endregion
 	}
